@@ -1,0 +1,248 @@
+
+.activity-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: #172033;
+}
+
+.activity-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.activity-eyebrow {
+    color: #6478e8;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.activity-heading h1 {
+    margin: 8px 0;
+    font-size: 30px;
+}
+
+.activity-heading p,
+.activity-panel-header p {
+    margin: 0;
+    color: #77859b;
+    font-size: 14px;
+}
+
+.activity-refresh,
+.activity-pagination button {
+    padding: 10px 15px;
+    border: 1px solid #dfe5ef;
+    border-radius: 9px;
+    background: white;
+    color: #34415a;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.activity-refresh:disabled,
+.activity-pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.activity-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 420px;
+}
+
+.activity-filter label {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.activity-filter select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dfe5ef;
+    border-radius: 10px;
+    background: white;
+    color: #26344d;
+}
+
+.activity-panel {
+    overflow: hidden;
+    border: 1px solid #e5eaf2;
+    border-radius: 16px;
+    background: white;
+}
+
+.activity-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 22px 24px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.activity-panel-header h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.activity-count {
+    padding: 7px 10px;
+    border-radius: 20px;
+    background: #f0f3ff;
+    color: #5366d6;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.activity-list {
+    padding: 0 24px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-avatar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #edf0ff;
+    color: #5265d5;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-description {
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.activity-description strong {
+    color: #202c42;
+}
+
+.activity-task {
+    margin-top: 5px;
+    color: #5366d6;
+    font-size: 13px;
+}
+
+.activity-date {
+    display: block;
+    margin-top: 7px;
+    color: #8792a5;
+    font-size: 12px;
+}
+
+.activity-action {
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: #f4f6fa;
+    color: #65728a;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.activity-empty {
+    padding: 48px 20px;
+    color: #77859b;
+    text-align: center;
+    font-size: 14px;
+}
+
+.activity-empty h3 {
+    margin: 12px 0 8px;
+    color: #26344d;
+}
+
+.activity-empty p {
+    margin: 0;
+}
+
+.activity-empty-icon {
+    font-size: 32px;
+}
+
+.activity-error {
+    padding: 13px 16px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fff1f2;
+    color: #b42335;
+    font-size: 14px;
+}
+
+.activity-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 18px;
+    border-top: 1px solid #edf0f5;
+}
+
+.activity-pagination span {
+    color: #647086;
+    font-size: 13px;
+}
+
+@media (max-width: 640px) {
+    .activity-heading {
+        align-items: flex-start;
+    }
+
+    .activity-heading h1 {
+        font-size: 25px;
+    }
+
+    .activity-refresh {
+        padding: 9px;
+    }
+
+    .activity-panel-header {
+        padding: 18px 14px;
+    }
+
+    .activity-list {
+        padding: 0 14px;
+    }
+
+    .activity-item {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .activity-action {
+        margin-left: 52px;
+    }
+
+    .activity-pagination {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

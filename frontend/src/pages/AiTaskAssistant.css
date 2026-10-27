@@ -1,0 +1,521 @@
+.ai-page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+  color: #1e293b;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.ai-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 30px;
+}
+
+.ai-eyebrow {
+  margin: 0 0 6px;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.ai-header h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 30px;
+  font-weight: 750;
+}
+
+.ai-subtitle {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.ai-panel,
+.ai-result-card,
+.ai-stat-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.ai-panel {
+  padding: 26px;
+  box-shadow: 0 5px 20px rgb(15 23 42 / 3%);
+}
+
+.ai-panel h2,
+.ai-results-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.ai-panel-description {
+  margin: 9px 0 24px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-form label {
+  margin-top: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ai-form input,
+.ai-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ai-form input {
+  min-height: 44px;
+  padding: 0 13px;
+}
+
+.ai-form textarea {
+  min-height: 120px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ai-form input:focus,
+.ai-form textarea:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgb(139 92 246 / 12%);
+}
+
+.ai-form input::placeholder,
+.ai-form textarea::placeholder {
+  color: #94a3b8;
+}
+
+.ai-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.ai-form-footer > span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.ai-form-footer button {
+  min-height: 44px;
+  padding: 0 19px;
+  border: 0;
+  border-radius: 9px;
+  background: #6d28d9;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-form-footer button:hover {
+  background: #5b21b6;
+}
+
+.ai-form-footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ai-error,
+.ai-success {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ai-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.ai-success {
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 25px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.ai-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ddd6fe;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: ai-spin 0.8s linear infinite;
+}
+
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-results {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.ai-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ai-results-header h2 {
+  font-size: 24px;
+}
+
+.ai-secondary-button,
+.ai-copy-button,
+.ai-create-subtask {
+  border: 1px solid #ddd6fe;
+  border-radius: 8px;
+  background: #fff;
+  color: #6d28d9;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ai-secondary-button {
+  padding: 10px 14px;
+}
+
+.ai-copy-button {
+  flex-shrink: 0;
+  padding: 7px 11px;
+}
+
+.ai-secondary-button:hover,
+.ai-copy-button:hover,
+.ai-create-subtask:hover {
+  background: #f5f3ff;
+}
+
+.ai-result-card {
+  padding: 22px;
+  box-shadow: 0 3px 12px rgb(15 23 42 / 2%);
+}
+
+.ai-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-card-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #f5f3ff;
+  font-size: 19px;
+}
+
+.ai-card-heading h3,
+.ai-result-card > h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.ai-card-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-card-heading > .ai-copy-button {
+  margin-left: auto;
+}
+
+.ai-card-caption {
+  margin: 5px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.ai-description {
+  margin: 18px 0 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.ai-apply-button {
+  margin-top: 18px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #6d28d9;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-apply-button:hover {
+  background: #5b21b6;
+}
+
+.ai-apply-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.ai-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.ai-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px;
+}
+
+.ai-stat-label {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ai-hours {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.ai-priority {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ai-priority-low {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ai-priority-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ai-priority-high {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.ai-priority-urgent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.ai-subtask-list,
+.ai-recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ai-subtask-list li {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-subtask-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ai-step-number {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ai-create-subtask {
+  flex-shrink: 0;
+  padding: 8px 10px;
+}
+
+.ai-create-subtask:disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.ai-recommendation-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-recommendation-list li > span {
+  color: #059669;
+  font-weight: 900;
+}
+
+.ai-raw-response {
+  margin: 16px 0 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .ai-page {
+    padding: 18px 14px;
+  }
+
+  .ai-header {
+    gap: 12px;
+  }
+
+  .ai-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 24px;
+  }
+
+  .ai-header h1 {
+    font-size: 23px;
+  }
+
+  .ai-panel,
+  .ai-result-card {
+    padding: 18px;
+  }
+
+  .ai-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ai-results-header h2 {
+    font-size: 20px;
+  }
+
+  .ai-form-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ai-form-footer button {
+    width: 100%;
+  }
+
+  .ai-card-heading {
+    flex-wrap: wrap;
+  }
+
+  .ai-card-heading > .ai-copy-button {
+    margin-left: auto;
+  }
+
+  .ai-subtask-list li {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .ai-subtask-text {
+    flex-basis: calc(100% - 48px);
+  }
+
+  .ai-create-subtask {
+    margin-left: 40px;
+  }
+}

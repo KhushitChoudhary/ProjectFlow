@@ -1,0 +1,26 @@
+const rateLimit = require("express-rate-limit");
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        message: "Too many login attempts. Try again later."
+    }
+});
+
+const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        message: "Too many AI requests. Please wait and try again."
+    }
+});
+
+module.exports = {
+    loginLimiter,
+    aiLimiter
+};
