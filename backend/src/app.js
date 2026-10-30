@@ -51,9 +51,6 @@ app.use('/api', analyticsRoutes);
 app.use('/api', aiRoutes);
 app.use('/api', attachmentRoutes);
 
-const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-app.use(notFound);
-app.use(errorHandler);
 
 app.get('/', (req, res) => {
     res.status(200).json({
@@ -61,5 +58,10 @@ app.get('/', (req, res) => {
         message: "ProjectFlow API is running"
     });
 });
+
+
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
