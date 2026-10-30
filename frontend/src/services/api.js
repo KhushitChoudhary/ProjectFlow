@@ -4,6 +4,8 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
 });
 
+console.log("API URL:", api.defaults.baseURL);
+
 // Automatically attach JWT token to requests
 api.interceptors.request.use(
     (config) => {
