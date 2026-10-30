@@ -1,7 +1,7 @@
 const commentModel = require("../models/commentModel");
 const projectModel = require("../models/projectModel");
 const taskModel = require("../models/taskModel");
-const workspaceModel = require("../models/workSpaceModel");
+const workspaceModel = require("../models/workspaceModel");
 
 const createComment = async (req, res) => {
     try {
