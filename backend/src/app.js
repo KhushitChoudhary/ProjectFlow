@@ -18,16 +18,22 @@ const helmet = require("helmet");
 
 const app = express();
 
-const allowedOrigins = (
-    process.env.FRONTEND_URL || "http://localhost:5173"
-)
-    .split(",")
-    .map((url) => url.trim());
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://project-flow-seven-flame.vercel.app"
+];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true
 }));
+
 
 app.disable("x-powered-by");
 
@@ -61,6 +67,7 @@ app.get('/', (req, res) => {
 
 
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+
 app.use(notFound);
 app.use(errorHandler);
 
