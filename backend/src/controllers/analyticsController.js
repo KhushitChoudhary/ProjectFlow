@@ -1,5 +1,5 @@
 const projectModel = require("../models/projectModel");
-const workspaceModel = require("../models/workSpaceModel");
+const workspaceModel = require("../models/workspaceModel");
 const taskModel = require("../models/taskModel");
 
 const getProjectAnalytics = async (req, res) => {
