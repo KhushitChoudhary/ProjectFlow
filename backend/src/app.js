@@ -56,7 +56,8 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
-    res.json({
+    res.status(200).json({
+        success: true,
         message: "ProjectFlow API is running"
     });
 });
