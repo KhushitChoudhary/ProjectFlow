@@ -14,7 +14,9 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const attachmentRoutes = require("./routes/attachmentRoutes");
+const invitationRoutes = require("./routes/invitationRoutes");
 const helmet = require("helmet");
+
 
 const app = express();
 
@@ -58,6 +60,7 @@ app.use('/api', notificationRoutes);
 app.use('/api', analyticsRoutes);
 app.use('/api', aiRoutes);
 app.use('/api', attachmentRoutes);
+app.use('/api', invitationRoutes);
 
 
 app.get('/', (req, res) => {

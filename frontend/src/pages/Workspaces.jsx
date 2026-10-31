@@ -10,7 +10,7 @@ import {
     rejectInvitation,
     updateWorkspaceMemberRole,
     removeWorkspaceMember
-} from "../services/workspaceApi";
+} from "../services/workapaceApi";
 
 import "./Workspaces.css";
 
