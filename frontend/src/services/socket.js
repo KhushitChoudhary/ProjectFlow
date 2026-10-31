@@ -1,6 +1,6 @@
 import {io} from "socket.io-client";
 
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = "https://projectflow-vtfl.onrender.com";
 
 export const connectSocket = (token) => {
     return io(SOCKET_URL, {

@@ -1,15 +1,21 @@
-const {Server} = require('socket.io');
-const jwt = require('jsonwebtoken');
-const projectModel = require('../models/projectModel');
-const workspaceModel = require('../models/workspaceModel');
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const projectModel = require("../models/projectModel");
+const workspaceModel = require("../models/workspaceModel");
 
 let io;
 
 const initializeSocket = (httpServer) => {
+    const allowedOrigins = [
+        "http://localhost:5173",
+        "https://project-flow-seven-flame.vercel.app/"
+    ];
+
     io = new Server(httpServer, {
         cors: {
-            origin: "http://localhost:5173",
-             methods: ["GET", "POST", "PUT", "DELETE"]
+            origin: allowedOrigins,
+            methods: ["GET", "POST", "PUT", "DELETE"],
+            credentials: true
         }
     });
 
@@ -18,7 +24,7 @@ const initializeSocket = (httpServer) => {
         try {
             const token = socket.handshake.auth?.token;
 
-            if(!token){
+            if (!token) {
                 return next(new Error("Authentication required"));
             }
 
@@ -29,7 +35,7 @@ const initializeSocket = (httpServer) => {
 
             socket.userId = decoded.userId;
             next();
-            
+
         } catch (error) {
             next(new Error("Invalid or expired token"));
         }
@@ -42,60 +48,66 @@ const initializeSocket = (httpServer) => {
 
         socket.on("joinProject", async (projectId, callback) => {
             try {
-                if ( typeof projectId !== "string" || !/^[a-fA-F0-9]{24}$/.test(projectId) ) { 
-                    
-                    return callback?.({ 
-                        success: false, 
-                        message: "Invalid project ID" }); 
+                if (
+                    typeof projectId !== "string" ||
+                    !/^[a-fA-F0-9]{24}$/.test(projectId)
+                ) {
+                    return callback?.({
+                        success: false,
+                        message: "Invalid project ID"
+                    });
                 }
 
-                const project = await projectModel.findById(projectId); 
-                
-                if (!project) { 
-                    return callback?.({ 
-                        success: false, 
-                        message: "Project not found" 
-                    }); 
-                } 
-                
-                const workspace = await workspaceModel.findById( project.workspace ); 
-                
-                if (!workspace) { 
-                    return callback?.({ 
-                        success: false, 
-                        message: "Workspace not found" 
-                    }); 
-                } 
-                
-                const isMember = workspace.members.some( 
-                    (member) => 
-                        member.user.toString() === socket.userId 
-                ); 
-                
-                if (!isMember) { 
-                    return callback?.({ 
-                        success: false, 
-                        message: "Access denied" 
-                    }); 
+                const project = await projectModel.findById(projectId);
+
+                if (!project) {
+                    return callback?.({
+                        success: false,
+                        message: "Project not found"
+                    });
                 }
 
-                socket.join(`project:${projectId}`); 
-                
-                callback?.({ 
-                    success: true, 
-                    message: "Joined project room" 
+                const workspace = await workspaceModel.findById(
+                    project.workspace
+                );
+
+                if (!workspace) {
+                    return callback?.({
+                        success: false,
+                        message: "Workspace not found"
+                    });
+                }
+
+                const isMember = workspace.members.some(
+                    (member) =>
+                        member.user.toString() === socket.userId
+                );
+
+                if (!isMember) {
+                    return callback?.({
+                        success: false,
+                        message: "Access denied"
+                    });
+                }
+
+                socket.join(`project:${projectId}`);
+
+                callback?.({
+                    success: true,
+                    message: "Joined project room"
                 });
-                
+
             } catch (error) {
-                console.error("Join project error:", error); 
-                
-                callback?.({ 
-                    success: false, 
-                    message: "Unable to join project" 
+                console.error("Join project error:", error);
+
+                callback?.({
+                    success: false,
+                    message: "Unable to join project"
                 });
             }
         });
-        socket.on("disconnect", () => { 
+
+        socket.on("disconnect", () => {
             console.log("Socket disconnected:", socket.userId);
         });
     });
@@ -104,14 +116,14 @@ const initializeSocket = (httpServer) => {
 };
 
 const getIO = () => {
-    if(!io){
+    if (!io) {
         throw new Error("Socket.IO has not been initialized");
     }
+
     return io;
 };
 
 module.exports = {
-    initializeSocket, getIO
+    initializeSocket,
+    getIO
 };
-
-
