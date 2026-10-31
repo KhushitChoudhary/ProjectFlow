@@ -101,15 +101,18 @@ useEffect(() => {
     });
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = (reason) => {
+    console.log("Socket disconnected:", reason);
     setSocketConnected(false);
     joinedProject = false;
-  };
+};
 
-  const handleConnectError = () => {
+  const handleConnectError = (error) => {
+    console.error("Socket connection error:", error.message);
+
     setSocketConnected(false);
-    setError("Unable to connect to live chat. Please check your session.");
-  };
+    setError(error.message);
+};
 
   const handleNewMessage = (message) => {
     if (!joinedProject) return;

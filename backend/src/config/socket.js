@@ -16,7 +16,8 @@ const initializeSocket = (httpServer) => {
             origin: allowedOrigins,
             methods: ["GET", "POST", "PUT", "DELETE"],
             credentials: true
-        }
+        },
+        transports: ["websocket", "polling"]
     });
 
     // Verify JWT before allowing a socket connection
@@ -107,9 +108,14 @@ const initializeSocket = (httpServer) => {
             }
         });
 
-        socket.on("disconnect", () => {
-            console.log("Socket disconnected:", socket.userId);
-        });
+        socket.on("disconnect", (reason) => {
+        console.log(
+        "Socket disconnected:",
+        socket.userId,
+        "Reason:",
+        reason
+    );
+});
     });
 
     return io;

@@ -39,6 +39,8 @@ app.disable("x-powered-by");
 
 app.use(helmet());
 
+app.set("trust proxy", 1);
+
 app.use(express.json({
     limit: "100kb"
 }));
