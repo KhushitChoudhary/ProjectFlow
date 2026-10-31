@@ -7,6 +7,7 @@ import "./AppLayout.css";
 
 const navigation = [
     { label: "Dashboard", path: "/dashboard", icon: "⌂" },
+    { label: "Workspaces", path: "/workspaces", icon: "▦" },
     { label: "My Projects", path: "/projects", icon: "▣" },
     { label: "Tasks", path: "/tasks", icon: "☑" },
     { label: "Activity Feed", path: "/activity", icon: "◷" },

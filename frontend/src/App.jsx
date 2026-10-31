@@ -19,6 +19,7 @@ import Tasks from "./pages/Tasks";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import ActivityFeed from "./pages/ActivityFeed";
+import Workspaces from "./pages/Workspaces";
 
 function ComingSoon({ title }) {
     return (
@@ -55,6 +56,11 @@ function App() {
                         <Route 
                             path="/dashboard" 
                             element={<Home />} 
+                        />
+
+                        <Route 
+                            path="/workspaces"
+                            element={<Workspaces />} 
                         />
 
                         <Route
