@@ -8,7 +8,7 @@ let io;
 const initializeSocket = (httpServer) => {
     const allowedOrigins = [
         "http://localhost:5173",
-        "https://project-flow-seven-flame.vercel.app/"
+        "https://project-flow-seven-flame.vercel.app"
     ];
 
     io = new Server(httpServer, {
