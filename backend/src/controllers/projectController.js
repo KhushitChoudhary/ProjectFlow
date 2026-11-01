@@ -133,8 +133,6 @@ const getProject = async (req, res) => {
 };
 
 
-
-
 const updateProject = async (req, res) => {
     try {
         if (!["OWNER", "ADMIN"].includes(req.workspaceRole)) {
@@ -225,10 +223,62 @@ const deleteProject = async (req, res) => {
 };
 
 
+const getProjectMembers = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        const project = await projectModel.findById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                success: false,
+                message: "Project not found"
+            });
+        }
+
+        const workspace = await workspaceModel
+            .findById(project.workspace)
+            .populate("members.user", "name email");
+
+        if (!workspace) {
+            return res.status(404).json({
+                success: false,
+                message: "Workspace not found"
+            });
+        }
+
+        const isMember = workspace.members.some(
+            (member) => member.user._id.toString() === req.userId
+        );
+
+        if (!isMember) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not a workspace member"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            members: workspace.members
+        });
+
+    } catch (error) {
+        console.error("Get project members error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+
 module.exports = {
     createProject,
     getWorkspaceProjects,
     getProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    getProjectMembers
 }

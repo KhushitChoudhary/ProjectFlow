@@ -1,7 +1,7 @@
 const express = require('express');
 
 const protect = require('../middleware/authMiddleware');
-const { createProject, getWorkspaceProjects, getProject, updateProject, deleteProject } = require('../controllers/projectController');
+const { createProject, getWorkspaceProjects, getProject, updateProject, deleteProject, getProjectMembers } = require('../controllers/projectController');
 const projectAccess = require('../middleware/projectAccessMiddleware');
 const validateObjectId = require('../middleware/validateObjectIdMiddleware');
 
@@ -11,6 +11,7 @@ router.post('/workspaces/:workspaceId/projects', protect, validateObjectId("work
 router.get('/workspaces/:workspaceId/projects', protect, validateObjectId("workspaceId"), getWorkspaceProjects);
 router.get('/projects/:projectId', protect, validateObjectId("projectId"), projectAccess, getProject);
 router.put('/projects/:projectId', protect, validateObjectId("projectId"), projectAccess, updateProject);
-router.delete('/projects/:projectId', protect, validateObjectId("projectId"), projectAccess, deleteProject)
+router.delete('/projects/:projectId', protect, validateObjectId("projectId"), projectAccess, deleteProject);
+router.get('/projects/:projectId/members', protect, validateObjectId("projectId"), getProjectMembers);
 
 module.exports = router;

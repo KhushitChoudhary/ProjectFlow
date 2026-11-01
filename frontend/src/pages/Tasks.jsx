@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
     createTask,
     deleteTask,
     getProjectTasks,
     updateTask,
 } from "../services/taskApi";
+
+import { getProjectMembers } from "../services/projectApi";
+
 import "./Tasks.css";
 
 const TASK_STATUSES = [
@@ -19,6 +23,7 @@ const initialForm = {
     description: "",
     priority: "MEDIUM",
     status: "TODO",
+    assignedTo: "",
 };
 
 function Tasks() {
@@ -31,6 +36,8 @@ function Tasks() {
     );
 
     const [tasks, setTasks] = useState([]);
+    const [projectMembers, setProjectMembers] = useState([]);
+
     const [form, setForm] = useState(initialForm);
     const [editingTask, setEditingTask] = useState(null);
 
@@ -39,10 +46,13 @@ function Tasks() {
     const [priorityFilter, setPriorityFilter] = useState("ALL");
 
     const [loading, setLoading] = useState(false);
+    const [loadingMembers, setLoadingMembers] = useState(false);
     const [saving, setSaving] = useState(false);
+
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
+    // Load project tasks
     const loadTasks = async (id = projectId) => {
         if (!id?.trim()) {
             setTasks([]);
@@ -61,25 +71,72 @@ function Tasks() {
                 err.response?.data?.message ||
                     "Failed to load tasks."
             );
+
             setTasks([]);
         } finally {
             setLoading(false);
         }
     };
 
+    // Load project members
+    const loadProjectMembers = async (id = projectId) => {
+        if (!id?.trim()) {
+            setProjectMembers([]);
+            return;
+        }
+
+        setLoadingMembers(true);
+
+        try {
+            const data = await getProjectMembers(id.trim());
+
+            const members = (data.members || [])
+                .map((member) => {
+                    const user =
+                        member.user &&
+                        typeof member.user === "object"
+                            ? member.user
+                            : member;
+
+                    return {
+                        _id: user._id || user.id,
+                        name: user.name || user.email || "Unnamed member",
+                        email: user.email || "",
+                        role: member.role || "MEMBER",
+                    };
+                })
+                .filter((member) => member._id);
+
+            setProjectMembers(members);
+        } catch (err) {
+            setProjectMembers([]);
+
+            setError(
+                err.response?.data?.message ||
+                    "Failed to load project members."
+            );
+        } finally {
+            setLoadingMembers(false);
+        }
+    };
+
+    // Load saved project on first render
     useEffect(() => {
-        const savedProjectId = localStorage.getItem("projectId") || "";
+        const savedProjectId =
+            localStorage.getItem("projectId") || "";
 
         setProjectId(savedProjectId);
         setProjectInput(savedProjectId);
 
         if (savedProjectId) {
             loadTasks(savedProjectId);
+            loadProjectMembers(savedProjectId);
         }
-        // Load the initially selected project.
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Select project
     const handleProjectSubmit = async (e) => {
         e.preventDefault();
 
@@ -91,13 +148,22 @@ function Tasks() {
         }
 
         localStorage.setItem("projectId", id);
+
         setProjectId(id);
         setMessage("");
         setError("");
 
-        await loadTasks(id);
+        setTasks([]);
+        setProjectMembers([]);
+        resetForm();
+
+        await Promise.all([
+            loadTasks(id),
+            loadProjectMembers(id),
+        ]);
     };
 
+    // Handle form changes
     const handleFormChange = (e) => {
         const { name, value } = e.target;
 
@@ -107,13 +173,16 @@ function Tasks() {
         }));
     };
 
+    // Reset form
     const resetForm = () => {
         setForm(initialForm);
         setEditingTask(null);
     };
 
+    // Create or update task
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         setError("");
         setMessage("");
 
@@ -136,6 +205,7 @@ function Tasks() {
             title: form.title.trim(),
             description: form.description.trim(),
             priority: form.priority,
+            assignedTo: form.assignedTo || null,
             ...(editingTask ? { status: form.status } : {}),
         };
 
@@ -144,16 +214,20 @@ function Tasks() {
         try {
             if (editingTask) {
                 await updateTask(editingTask._id, taskData);
+
                 setMessage("Task updated successfully.");
             } else {
                 await createTask(projectId, taskData);
+
                 setMessage("Task created successfully.");
             }
 
             resetForm();
+
             await loadTasks(projectId);
         } catch (err) {
-            const validationErrors = err.response?.data?.errors;
+            const validationErrors =
+                err.response?.data?.errors;
 
             setError(
                 validationErrors?.map((item) => item.msg).join(", ") ||
@@ -165,6 +239,7 @@ function Tasks() {
         }
     };
 
+    // Edit task
     const handleEdit = (task) => {
         setEditingTask(task);
 
@@ -173,6 +248,10 @@ function Tasks() {
             description: task.description || "",
             priority: task.priority || "MEDIUM",
             status: task.status || "TODO",
+            assignedTo:
+                task.assignedTo?._id ||
+                task.assignedTo ||
+                "",
         });
 
         setMessage("");
@@ -184,7 +263,7 @@ function Tasks() {
         });
     };
 
-    // Update task status directly from the task table.
+    // Update task status
     const handleStatusChange = async (task, newStatus) => {
         if (task.status === newStatus) return;
 
@@ -193,7 +272,6 @@ function Tasks() {
 
         const previousTasks = tasks;
 
-        // Update the UI immediately.
         setTasks((prev) =>
             prev.map((item) =>
                 item._id === task._id
@@ -215,10 +293,8 @@ function Tasks() {
                 }.`
             );
 
-            // Refresh data so the displayed statistics stay accurate.
             await loadTasks(projectId);
         } catch (err) {
-            // Restore the previous task list if the update fails.
             setTasks(previousTasks);
 
             setError(
@@ -228,6 +304,7 @@ function Tasks() {
         }
     };
 
+    // Delete task
     const handleDelete = async (task) => {
         const confirmed = window.confirm(
             `Are you sure you want to delete the task "${task.title}"?`
@@ -253,18 +330,20 @@ function Tasks() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to delete the task."
+                    "Failed to delete task."
             );
         }
     };
 
+    // Search and filters
     const filteredTasks = useMemo(() => {
         return tasks.filter((task) => {
             const text = `${task.title || ""} ${
                 task.description || ""
             }`.toLowerCase();
 
-            const matchesSearch = text.includes(search.toLowerCase());
+            const matchesSearch =
+                text.includes(search.toLowerCase());
 
             const matchesStatus =
                 statusFilter === "ALL" ||
@@ -282,14 +361,14 @@ function Tasks() {
         });
     }, [tasks, search, statusFilter, priorityFilter]);
 
+    // Statistics
     const countStatus = (status) =>
         tasks.filter((task) => task.status === status).length;
 
-    const formatLabel = (value) =>
-        (value || "TODO").replaceAll("_", " ");
-
     return (
         <main className="tasks-page">
+
+            {/* Header */}
             <header className="tasks-header">
                 <div>
                     <p className="tasks-eyebrow">
@@ -305,19 +384,25 @@ function Tasks() {
 
                 <button
                     className="tasks-refresh-btn"
-                    onClick={() => loadTasks()}
+                    onClick={() => {
+                        loadTasks();
+                        loadProjectMembers();
+                    }}
                     disabled={loading || !projectId}
                 >
                     {loading ? "Loading..." : "↻ Refresh"}
                 </button>
             </header>
 
+            {/* Project Selection */}
             <section className="tasks-project-panel">
                 <form
                     onSubmit={handleProjectSubmit}
                     className="tasks-project-form"
                 >
-                    <label htmlFor="projectId">Project ID</label>
+                    <label htmlFor="projectId">
+                        Project ID
+                    </label>
 
                     <div className="tasks-project-controls">
                         <input
@@ -341,6 +426,7 @@ function Tasks() {
                 </p>
             </section>
 
+            {/* Alerts */}
             {error && (
                 <div
                     className="tasks-alert tasks-alert-error"
@@ -359,6 +445,7 @@ function Tasks() {
                 </div>
             )}
 
+            {/* Statistics */}
             <section className="tasks-stats">
                 <article className="tasks-stat-card">
                     <span>Total Tasks</span>
@@ -386,11 +473,14 @@ function Tasks() {
                 </article>
             </section>
 
+            {/* Create / Edit Task */}
             <section className="tasks-form-card">
                 <div className="tasks-section-heading">
                     <div>
                         <h2>
-                            {editingTask ? "Edit Task" : "Create a Task"}
+                            {editingTask
+                                ? "Edit Task"
+                                : "Create a Task"}
                         </h2>
 
                         <p>
@@ -411,9 +501,14 @@ function Tasks() {
                     )}
                 </div>
 
-                <form onSubmit={handleSubmit} className="tasks-form">
+                <form
+                    onSubmit={handleSubmit}
+                    className="tasks-form"
+                >
                     <div className="tasks-field tasks-field-full">
-                        <label htmlFor="title">Task Title *</label>
+                        <label htmlFor="title">
+                            Task Title *
+                        </label>
 
                         <input
                             id="title"
@@ -446,7 +541,9 @@ function Tasks() {
                     </div>
 
                     <div className="tasks-field">
-                        <label htmlFor="priority">Priority</label>
+                        <label htmlFor="priority">
+                            Priority
+                        </label>
 
                         <select
                             id="priority"
@@ -461,9 +558,54 @@ function Tasks() {
                         </select>
                     </div>
 
+                    {/* Assign To */}
+                    <div className="tasks-field">
+                        <label htmlFor="assignedTo">
+                            Assign To
+                        </label>
+
+                        <select
+                            id="assignedTo"
+                            name="assignedTo"
+                            value={form.assignedTo}
+                            onChange={handleFormChange}
+                            disabled={loadingMembers || !projectId}
+                        >
+                            <option value="">
+                                Unassigned
+                            </option>
+
+                            {projectMembers.map((member) => (
+                                <option
+                                    key={member._id}
+                                    value={member._id}
+                                >
+                                    {member.name} ({member.role})
+                                </option>
+                            ))}
+                        </select>
+
+                        {loadingMembers && (
+                            <small>
+                                Loading project members...
+                            </small>
+                        )}
+
+                        {!loadingMembers &&
+                            projectId &&
+                            projectMembers.length === 0 && (
+                                <small>
+                                    No project members found.
+                                </small>
+                            )}
+                    </div>
+
+                    {/* Status only while editing */}
                     {editingTask && (
                         <div className="tasks-field">
-                            <label htmlFor="status">Status</label>
+                            <label htmlFor="status">
+                                Status
+                            </label>
 
                             <select
                                 id="status"
@@ -499,21 +641,26 @@ function Tasks() {
                 </form>
             </section>
 
+            {/* Task List */}
             <section className="tasks-list-section">
                 <div className="tasks-section-heading">
                     <div>
                         <h2>Project Tasks</h2>
+
                         <p>
                             {filteredTasks.length} task(s) found
                         </p>
                     </div>
                 </div>
 
+                {/* Filters */}
                 <div className="tasks-filters">
                     <input
                         aria-label="Search tasks"
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) =>
+                            setSearch(e.target.value)
+                        }
                         placeholder="Search tasks..."
                     />
 
@@ -524,7 +671,9 @@ function Tasks() {
                             setStatusFilter(e.target.value)
                         }
                     >
-                        <option value="ALL">All Statuses</option>
+                        <option value="ALL">
+                            All Statuses
+                        </option>
 
                         {TASK_STATUSES.map((status) => (
                             <option
@@ -543,7 +692,10 @@ function Tasks() {
                             setPriorityFilter(e.target.value)
                         }
                     >
-                        <option value="ALL">All Priorities</option>
+                        <option value="ALL">
+                            All Priorities
+                        </option>
+
                         <option value="LOW">Low</option>
                         <option value="MEDIUM">Medium</option>
                         <option value="HIGH">High</option>
@@ -561,8 +713,12 @@ function Tasks() {
                     </div>
                 ) : filteredTasks.length === 0 ? (
                     <div className="tasks-empty-state">
-                        <span className="tasks-empty-icon">✓</span>
+                        <span className="tasks-empty-icon">
+                            ✓
+                        </span>
+
                         <h3>No Tasks Found</h3>
+
                         <p>
                             Create a task or adjust your search filters.
                         </p>
@@ -585,7 +741,9 @@ function Tasks() {
                                     <tr key={task._id}>
                                         <td>
                                             <div className="tasks-title-cell">
-                                                <strong>{task.title}</strong>
+                                                <strong>
+                                                    {task.title}
+                                                </strong>
 
                                                 {task.description && (
                                                     <span>

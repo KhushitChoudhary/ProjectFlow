@@ -88,6 +88,20 @@ const createTask = async(req, res) => {
         });
 
 
+        if(assignedTo){
+            const isAssigneeMember = workspaceModel.some(
+                (member) => member.user.toString() === assignedTo.toString()
+            );
+
+            if(!isAssigneeMember){
+                return res.status(400).json({
+                    success: false,
+                    message: "Assignee is not a workspace menber"
+                });
+            }
+        }
+
+
         if(
             task.assignedTo &&
             task.assignedTo.toString() !== req.userId
@@ -268,7 +282,6 @@ const getTask = async (req, res) => {
 };
 
 
-
 const updateTask = async (req, res) => {
     try {
         const {
@@ -330,6 +343,20 @@ const updateTask = async (req, res) => {
 
         if (priority !== undefined && priority !== task.priority) {
             changes.push(`changed priority from ${task.priority} to ${priority}`);
+        }
+
+
+        if(assignedTo){
+            const isAssigneeMember = workspaceModel.some(
+                (member) => member.user.toString() === assignedTo.toString()
+            );
+
+            if(!isAssigneeMember){
+                return res.status(400).json({
+                    success: false,
+                    message: "Assignee is not a workspace menber"
+                });
+            }
         }
 
         const previousAssignedTo = task.assignedTo
