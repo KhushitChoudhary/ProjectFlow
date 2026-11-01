@@ -1,28 +1,26 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const sendInvitationEmail = async ({ to, workspaceName, inviterName }) => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT || 465),
-        secure: process.env.SMTP_SECURE === "true",
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
-    });
+const sendInvitationEmail = async ({
+    to,
+    workspaceName,
+    inviterName
+}) => {
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const frontendUrl =
+        process.env.FRONTEND_URL ||
+        "http://localhost:5173";
 
-    await transporter.sendMail({
-        from: `"ProjectFlow" <${process.env.SMTP_USER}>`,
-        to,
+    const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM,
+        to: [to],
         subject: `You've been invited to ${workspaceName} on ProjectFlow`,
         text: `
 Hi,
 
 ${inviterName} has invited you to join the "${workspaceName}" workspace on ProjectFlow.
 
-Log in to your ProjectFlow account and open the Workspaces page to accept or reject this invitation.
+Login to your ProjectFlow account and open the Workspaces page to accept or reject this invitation.
 
 ${frontendUrl}/workspaces
 
@@ -32,6 +30,13 @@ Regards,
 ProjectFlow Team
         `
     });
+
+    if (error) {
+        console.error("Resend email error:", error);
+        throw new Error(error.message);
+    }
+
+    return data;
 };
 
 module.exports = { sendInvitationEmail };
