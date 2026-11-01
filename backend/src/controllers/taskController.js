@@ -50,6 +50,19 @@ const createTask = async(req, res) => {
             });
         }
 
+        if(assignedTo){
+            const isAssigneeMember = workspace.members.some(
+                (member) => member.user.toString() === assignedTo.toString()
+            );
+
+            if(!isAssigneeMember){
+                return res.status(400).json({
+                    success: false,
+                    message: "Assignee is not a workspace menber"
+                });
+            }
+        }
+
         const task = await taskModel.create({
             title,
             description,
@@ -86,20 +99,6 @@ const createTask = async(req, res) => {
                 createdBy: task.createdBy
             }
         });
-
-
-        if(assignedTo){
-            const isAssigneeMember = workspaceModel.some(
-                (member) => member.user.toString() === assignedTo.toString()
-            );
-
-            if(!isAssigneeMember){
-                return res.status(400).json({
-                    success: false,
-                    message: "Assignee is not a workspace menber"
-                });
-            }
-        }
 
 
         if(
@@ -282,6 +281,7 @@ const getTask = async (req, res) => {
 };
 
 
+
 const updateTask = async (req, res) => {
     try {
         const {
@@ -331,6 +331,30 @@ const updateTask = async (req, res) => {
             });
         }
 
+        // Validate new assignee
+        if (assignedTo !== undefined && assignedTo !== null && assignedTo !== "") {
+
+            const isAssigneeMember = workspace.members.some(
+                (member) =>
+                    member.user.toString() === assignedTo.toString()
+            );
+
+            if (!isAssigneeMember) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Assignee is not a workspace member"
+                });
+            }
+        }
+
+        const previousAssignedTo = task.assignedTo
+            ? task.assignedTo.toString()
+            : null;
+
+        const nextAssignedTo = assignedTo === undefined
+            ? previousAssignedTo
+            : (assignedTo || null);
+
         const changes = [];
 
         if (title !== undefined && title !== task.title) {
@@ -345,39 +369,20 @@ const updateTask = async (req, res) => {
             changes.push(`changed priority from ${task.priority} to ${priority}`);
         }
 
-
-        if(assignedTo){
-            const isAssigneeMember = workspaceModel.some(
-                (member) => member.user.toString() === assignedTo.toString()
-            );
-
-            if(!isAssigneeMember){
-                return res.status(400).json({
-                    success: false,
-                    message: "Assignee is not a workspace menber"
-                });
-            }
-        }
-
-        const previousAssignedTo = task.assignedTo
-            ? task.assignedTo.toString()
-            : null;
-
-        const nextAssignedTo = assignedTo === undefined
-            ? previousAssignedTo
-            : (assignedTo || null);
-
         if (nextAssignedTo !== previousAssignedTo) {
             changes.push("changed task assignment");
         }
 
         task.title = title ?? task.title;
         task.description = description ?? task.description;
+
         task.assignedTo = assignedTo === undefined
             ? task.assignedTo
             : (assignedTo || null);
+
         task.status = status ?? task.status;
         task.priority = priority ?? task.priority;
+
         task.dueDate = dueDate === undefined
             ? task.dueDate
             : (dueDate || null);
@@ -414,14 +419,11 @@ const updateTask = async (req, res) => {
                 }
             });
 
-        const currentAssignedTo = task.assignedTo
-            ? task.assignedTo.toString()
-            : null;
-
+        // Notify only when a new assignee is selected
         if (
-            currentAssignedTo &&
-            currentAssignedTo !== previousAssignedTo &&
-            currentAssignedTo !== req.userId
+            nextAssignedTo &&
+            nextAssignedTo !== previousAssignedTo &&
+            nextAssignedTo !== req.userId
         ) {
             await createNotification({
                 recipient: task.assignedTo,
@@ -439,6 +441,7 @@ const updateTask = async (req, res) => {
             message: "Task updated successfully",
             task
         });
+
     } catch (error) {
         console.error("Update task error:", error);
 
@@ -448,6 +451,7 @@ const updateTask = async (req, res) => {
         });
     }
 };
+
 
 
 const deleteTask = async (req, res) => {
