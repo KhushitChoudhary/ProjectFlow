@@ -1,8 +1,7 @@
-const OLLAMA_URL =
-    process.env.OLLAMA_URL || "http://localhost:11434";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const OLLAMA_MODEL =
-    process.env.OLLAMA_MODEL || "llama3.2";
+const GROQ_MODEL =
+    process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
 const generateTaskSuggestions = async (title, details) => {
     const prompt = `
@@ -46,39 +45,54 @@ Requirements:
 - Return JSON only. Do not use Markdown.
 `;
 
-    const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+    const response = await fetch(GROQ_API_URL, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
         },
         body: JSON.stringify({
-            model: OLLAMA_MODEL,
-            prompt,
-            format: "json",
-            stream: false,
-            options: {
-                temperature: 0.5
+            model: GROQ_MODEL,
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an expert software project manager. Return only valid JSON."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            temperature: 0.5,
+            max_tokens: 2000,
+            response_format: {
+                type: "json_object"
             }
         }),
-        signal: AbortSignal.timeout(120000)
+        signal: AbortSignal.timeout(60000)
     });
-
-    if (!response.ok) {
-        throw new Error("Ollama request failed");
-    }
 
     const data = await response.json();
 
-    if (typeof data.response !== "string" || !data.response.trim()) {
-        throw new Error("Ollama returned an empty response");
+    if (!response.ok) {
+        console.error("Groq API Error:", data);
+        throw new Error(
+            data.error?.message || "Groq request failed"
+        );
+    }
+
+    const content = data.choices?.[0]?.message?.content;
+
+    if (typeof content !== "string" || !content.trim()) {
+        throw new Error("Groq returned an empty response");
     }
 
     let suggestions;
 
     try {
-        suggestions = JSON.parse(data.response);
+        suggestions = JSON.parse(content);
     } catch {
-        throw new Error("Ollama returned invalid JSON");
+        throw new Error("Groq returned invalid JSON");
     }
 
     const allowedPriorities = ["LOW", "MEDIUM", "HIGH", "URGENT"];
@@ -118,7 +132,11 @@ Requirements:
         (item) => placeholders.includes(item.toLowerCase())
     );
 
-    if (subtasks.length < 3 || recommendations.length < 1 || hasPlaceholder) {
+    if (
+        subtasks.length < 3 ||
+        recommendations.length < 1 ||
+        hasPlaceholder
+    ) {
         throw new Error(
             "AI returned generic suggestions. Please generate the plan again."
         );

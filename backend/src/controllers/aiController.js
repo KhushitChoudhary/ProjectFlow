@@ -42,9 +42,9 @@ const getTaskSuggestions = async (req, res) => {
             });
         }
 
-        if (error.message === "Ollama request failed") {
+        if (error.message === "Groq request failed") {
             return res.status(502).json({
-                message: "Could not get a response from Ollama"
+                message: "Could not get a response from Groq AI"
             });
         }
 
