@@ -39,7 +39,8 @@ router.get(
     "/projects/:projectId/tasks/:taskId/attachments",
     protect,
     projectAccess,
-    validateObjectId("projectId, taskId"),
+    validateObjectId("projectId"),
+    validateObjectId("taskId"),
     getTaskAttachments
 );
 
@@ -47,7 +48,8 @@ router.get(
     "/projects/:projectId/attachments/:attachmentId/download",
     protect,
     projectAccess,
-    validateObjectId("attachementId"),
+    validateObjectId("projectId"),
+    validateObjectId("attachmentId"),
     downloadAttachment
 );
 
@@ -55,7 +57,8 @@ router.delete(
     "/projects/:projectId/attachments/:attachmentId",
     protect,
     projectAccess,
-    validateObjectId("projectId, attachementId"),
+    validateObjectId("projectId"),
+    validateObjectId("attachmentId"),
     deleteAttachment
 );
 

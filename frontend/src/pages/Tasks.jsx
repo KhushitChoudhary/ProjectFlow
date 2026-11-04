@@ -5,9 +5,13 @@ import {
     deleteTask,
     getProjectTasks,
     updateTask,
+    getTaskComments,
+    createTaskComment,
+    deleteTaskComment,
 } from "../services/taskApi";
 
 import { getProjectMembers } from "../services/projectApi";
+import { userAuth } from "../context/AuthContext";
 
 import "./Tasks.css";
 
@@ -40,6 +44,15 @@ function Tasks() {
 
     const [form, setForm] = useState(initialForm);
     const [editingTask, setEditingTask] = useState(null);
+    const [detailsTask, setDetailsTask] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [commentText, setCommentText] = useState("");
+    const [commentsLoading, setCommentsLoading] = useState(false);
+    const [commentSaving, setCommentSaving] = useState(false);
+    const [commentError, setCommentError] = useState("");
+    const [commentMessage, setCommentMessage] = useState("");
+    const { user } = userAuth();
+    const currentUserId = user?._id || user?.id || "";
 
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
@@ -331,6 +344,63 @@ function Tasks() {
             setError(
                 err.response?.data?.message ||
                     "Failed to delete task."
+            );
+        }
+    };
+
+    // Task comments
+    const openTaskDetails = async (task) => {
+        setDetailsTask(task);
+        setComments([]);
+        setCommentText("");
+        setCommentError("");
+        setCommentMessage("");
+        setCommentsLoading(true);
+
+        try {
+            const data = await getTaskComments(task._id);
+            setComments(data.comments || []);
+        } catch (err) {
+            setCommentError(
+                err.response?.data?.message || "Failed to load comments."
+            );
+        } finally {
+            setCommentsLoading(false);
+        }
+    };
+
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+        const content = commentText.trim();
+        if (!content || !detailsTask || commentSaving) return;
+
+        setCommentSaving(true);
+        setCommentError("");
+        setCommentMessage("");
+        try {
+            const data = await createTaskComment(detailsTask._id, content);
+            setComments((prev) => [...prev, data.comment]);
+            setCommentText("");
+            setCommentMessage("Comment added.");
+        } catch (err) {
+            setCommentError(
+                err.response?.data?.message || "Failed to add comment."
+            );
+        } finally {
+            setCommentSaving(false);
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm("Delete this comment?")) return;
+        setCommentError("");
+        try {
+            await deleteTaskComment(commentId);
+            setComments((prev) => prev.filter((item) => item._id !== commentId));
+            setCommentMessage("Comment deleted.");
+        } catch (err) {
+            setCommentError(
+                err.response?.data?.message || "Failed to delete comment."
             );
         }
     };
@@ -801,6 +871,13 @@ function Tasks() {
                                             <div className="tasks-row-actions">
                                                 <button
                                                     type="button"
+                                                    className="tasks-details-btn"
+                                                    onClick={() => openTaskDetails(task)}
+                                                >
+                                                    Comments
+                                                </button>
+                                                <button
+                                                    type="button"
                                                     className="tasks-edit-btn"
                                                     onClick={() =>
                                                         handleEdit(task)
@@ -827,6 +904,101 @@ function Tasks() {
                     </div>
                 )}
             </section>
+
+            {detailsTask && (
+                <div
+                    className="task-details-backdrop"
+                    role="presentation"
+                    onMouseDown={(e) => {
+                        if (e.target === e.currentTarget) setDetailsTask(null);
+                    }}
+                >
+                    <section
+                        className="task-details-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="task-details-title"
+                    >
+                        <header className="task-details-header">
+                            <div>
+                                <p className="tasks-eyebrow">TASK DISCUSSION</p>
+                                <h2 id="task-details-title">{detailsTask.title}</h2>
+                                <p>{detailsTask.description || "No description provided."}</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="task-details-close"
+                                aria-label="Close task details"
+                                onClick={() => setDetailsTask(null)}
+                            >×</button>
+                        </header>
+
+                        <div className="task-comments-body">
+                            <div className="task-comments-heading">
+                                <h3>Comments</h3>
+                                <span>{comments.length}</span>
+                            </div>
+
+                            {commentError && <div className="tasks-alert tasks-alert-error">{commentError}</div>}
+                            {commentMessage && <div className="tasks-alert tasks-alert-success">{commentMessage}</div>}
+
+                            {commentsLoading ? (
+                                <p className="task-comments-empty">Loading comments...</p>
+                            ) : comments.length === 0 ? (
+                                <p className="task-comments-empty">No comments yet. Start the discussion.</p>
+                            ) : (
+                                <div className="task-comments-list">
+                                    {comments.map((comment) => {
+                                        const authorId = comment.user?._id || comment.user?.id;
+                                        const isOwnComment = currentUserId && String(authorId) === String(currentUserId);
+                                        return (
+                                            <article className="task-comment" key={comment._id}>
+                                                <div className="task-comment-avatar">
+                                                    {(comment.user?.name || comment.user?.email || "U").charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="task-comment-content">
+                                                    <div className="task-comment-meta">
+                                                        <strong>{comment.user?.name || comment.user?.email || "Workspace member"}</strong>
+                                                        <time dateTime={comment.createdAt}>
+                                                            {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ""}
+                                                        </time>
+                                                    </div>
+                                                    <p>{comment.content}</p>
+                                                </div>
+                                                {isOwnComment && (
+                                                    <button
+                                                        type="button"
+                                                        className="task-comment-delete"
+                                                        onClick={() => handleDeleteComment(comment._id)}
+                                                    >Delete</button>
+                                                )}
+                                            </article>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <form className="task-comment-form" onSubmit={handleAddComment}>
+                            <label htmlFor="taskCommentInput">Add a comment</label>
+                            <textarea
+                                id="taskCommentInput"
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                placeholder="Share an update or ask a question..."
+                                rows={3}
+                                maxLength={2000}
+                            />
+                            <div className="task-comment-form-footer">
+                                <small>{commentText.length}/2000</small>
+                                <button type="submit" disabled={commentSaving || !commentText.trim()}>
+                                    {commentSaving ? "Sending..." : "Post Comment"}
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            )}
         </main>
     );
 }

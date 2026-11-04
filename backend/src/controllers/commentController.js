@@ -162,6 +162,40 @@ const deleteComment = async (req, res) => {
             });
         }
 
+        const task = await taskModel.findById(comment.task);
+        if (!task) {
+            return res.status(404).json({
+                success: false,
+                message: "Task not found"
+            });
+        }
+
+        const project = await projectModel.findById(task.project);
+        if (!project) {
+            return res.status(404).json({
+                success: false,
+                message: "Project not found"
+            });
+        }
+
+        const workspace = await workspaceModel.findById(project.workspace);
+        if (!workspace) {
+            return res.status(404).json({
+                success: false,
+                message: "Workspace not found"
+            });
+        }
+
+        const isMember = workspace.members.some(
+            (member) => member.user.toString() === req.userId
+        );
+        if (!isMember) {
+            return res.status(403).json({
+                success: false,
+                message: "You do not have access to this task"
+            });
+        }
+
         if (comment.user.toString() !== req.userId) {
             return res.status(403).json({
                 success: false,
@@ -169,9 +203,7 @@ const deleteComment = async (req, res) => {
             });
         }
 
-        await commentModel.findByIdAndDelete(
-            req.params.commentId
-        );
+        await commentModel.findByIdAndDelete(req.params.commentId);
 
         res.status(200).json({
             success: true,

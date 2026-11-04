@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.post('/tasks/:taskId/comments', protect, validateObjectId("taskId"), createComment);
 router.get('/tasks/:taskId/comments', protect, validateObjectId("taskId"), getTaskComments);
-router.delete('/tasks/:taskId/comments', protect, validateObjectId("taskId"), deleteComment);
+router.delete('/comments/:commentId', protect, validateObjectId("commentId"), deleteComment);
 
 module.exports = router;
