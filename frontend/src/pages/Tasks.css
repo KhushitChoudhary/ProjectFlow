@@ -603,3 +603,133 @@
   .task-comment-form { padding-left: 16px; padding-right: 16px; }
   .task-comment-meta { flex-direction: column; gap: 2px; }
 }
+
+
+/* Task Attachments */
+
+.task-attachments-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.task-attachments-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.task-attachments-heading h3 {
+    margin: 0 0 5px;
+}
+
+.task-attachments-heading p {
+    margin: 0;
+    color: #888;
+    font-size: 13px;
+}
+
+.task-attachment-upload-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.task-attachment-upload-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.task-attachments-empty {
+    padding: 22px;
+    text-align: center;
+    color: #888;
+    background: rgba(128, 128, 128, 0.06);
+    border-radius: 10px;
+}
+
+.task-attachments-empty span {
+    font-size: 25px;
+}
+
+.task-attachments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+}
+
+.task-attachment-icon {
+    font-size: 25px;
+}
+
+.task-attachment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    flex: 1;
+}
+
+.task-attachment-info strong {
+    overflow-wrap: anywhere;
+    font-size: 14px;
+}
+
+.task-attachment-info span {
+    color: #888;
+    font-size: 12px;
+}
+
+.task-attachment-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.task-attachment-actions button {
+    padding: 7px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.task-attachment-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.task-attachment-actions .task-attachment-delete {
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+@media (max-width: 600px) {
+    .task-attachments-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .task-attachment-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .task-attachment-actions {
+        width: 100%;
+        padding-left: 37px;
+    }
+}

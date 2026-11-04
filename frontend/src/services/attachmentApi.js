@@ -1,38 +1,30 @@
 import api from "./api";
 
-export const getTaskAttachments = async (
-    projectId,
-    taskId
-) => {
-    const response = await api.get(
-        `/projects/${projectId}/tasks/${taskId}/attachments`,
-        getAuthConfig()
-    );
-
-    return response.data;
-};
-
+// Upload attachment
 export const uploadTaskAttachment = async (
     projectId,
     taskId,
-    file
+    formData
 ) => {
-    const formData = new FormData();
-
-    formData.append("file", file);
-
     const response = await api.post(
         `/projects/${projectId}/tasks/${taskId}/attachments`,
-        formData,
+        formData
     );
 
     return response.data;
 };
 
-export const downloadTaskAttachment = async (
-    projectId,
-    attachmentId
-) => {
+// Get task attachments
+export const getTaskAttachments = async (projectId, taskId) => {
+    const response = await api.get(
+        `/projects/${projectId}/tasks/${taskId}/attachments`
+    );
+
+    return response.data;
+};
+
+// Download attachment
+export const downloadAttachment = async (projectId, attachmentId) => {
     const response = await api.get(
         `/projects/${projectId}/attachments/${attachmentId}/download`,
         {
@@ -43,12 +35,10 @@ export const downloadTaskAttachment = async (
     return response.data;
 };
 
-export const deleteTaskAttachment = async (
-    projectId,
-    attachmentId
-) => {
+// Delete attachment
+export const deleteAttachment = async (projectId, attachmentId) => {
     const response = await api.delete(
-        `/projects/${projectId}/attachments/${attachmentId}`,
+        `/projects/${projectId}/attachments/${attachmentId}`
     );
 
     return response.data;

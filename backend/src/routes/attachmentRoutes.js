@@ -30,6 +30,7 @@ router.post(
     protect,
     projectAccess,
     validateObjectId("projectId"),
+    validateObjectId("taskId"),
     canUploadFiles,
     uploadSingleFile,
     uploadAttachment
