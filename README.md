@@ -288,7 +288,6 @@ ProjectFlow is deployed using the following platforms:
 |---|---|---|
 | Frontend | Vercel | https://project-flow-seven-flame.vercel.app |
 | Backend | Render | https://projectflow-vtfl.onrender.com |
-| API Base URL | Render | https://projectflow-vtfl.onrender.com/api |
 
 **Note:** Some features require a registered and authenticated account. AI functionality also depends on the configured AI service being available.
 
